@@ -1,8 +1,8 @@
 #放置静态页面的分支名
-BRANCH_SITE = master
+BRANCH_SITE=master
 
 #放置jekyll源码的分支名
-BRANCH_SOURCE = source
+BRANCH_SOURCE=source
 
 read -p "please input log for commit:" log
 if [ ! -n "$log" ] ;then
@@ -16,14 +16,14 @@ else
 	cp -r ./_site ../deploy_tmp
 	
 	git add --all
-	git commit -m ${log}
+	git commit -m '${log}'
 
 	git checkout ${BRANCH_SITE}
 	rm -r ./*
 	cp -r ../deploy_tmp/* ./
 	rm -rf ../deploy_tmp
 	git add --all
-	git commit -m ${log}
+	git commit -m '${log}'
 	
 	git push -u origin ${BRANCH_SITE}
 	git push -u origin ${BRANCH_SOURCE}
