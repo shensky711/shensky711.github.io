@@ -11,7 +11,7 @@ else
 #	git commit -m $(log)
 #	jekyll build
 	rm _site/makefile
-	cp -r _site/ ../deploy_tmp
+	cp -r ./_site/* ../deploy_tmp
 	git checkout master
 	rm -r ./*
 	cp -r ../deploy_tmp/* ./
