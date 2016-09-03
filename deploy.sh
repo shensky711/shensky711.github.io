@@ -4,6 +4,8 @@ BRANCH_SITE=master
 #放置jekyll源码的分支名
 BRANCH_SOURCE=source
 
+shopt -s extglob
+
 read -p "please input log for commit:" log
 if [ ! -n "$log" ] ;then
 	echo "you have not input log !"  
@@ -22,7 +24,7 @@ else
 
 	echo "checkout for master"
 	git checkout ${BRANCH_SITE}
-	rm -r ./*
+	rm -rf !(.git|.gitignore) ./*
 	cp -r ../deploy_tmp/* ./
 	rm -rf ../deploy_tmp
 	echo "add for master"
