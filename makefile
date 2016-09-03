@@ -14,7 +14,7 @@ else
 	cp -r ./_site ../deploy_tmp
 	git checkout master
 	rm -r ./*
-	cp -r ../deploy_tmp/ ./
+	cp -r ../deploy_tmp/* ./
 #	git add -all
 #	git commit -m $(log)
 	echo "deploy succeed"
