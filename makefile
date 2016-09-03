@@ -11,10 +11,10 @@ else
 #	git commit -m $(log)
 #	jekyll build
 	rm -f _site/makefile
-	cp -r ./_site/* ../deploy_tmp/
+	cp -r ./_site ../deploy_tmp
 	git checkout master
 	rm -r ./*
-	cp -r ../deploy_tmp/* ./
+	cp -r ../deploy_tmp/_site/ ./
 #	git add -all
 #	git commit -m $(log)
 	echo "deploy succeed"
