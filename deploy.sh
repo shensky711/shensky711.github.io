@@ -15,15 +15,20 @@ else
 	rm -rf ../deploy_tmp
 	cp -r ./_site ../deploy_tmp
 	
+	echo "add for source"
 	git add --all
-	git commit -m '${log}'
+	echo "commit for source"
+	git commit -m "${log}"
 
+	echo "checkout for master"
 	git checkout ${BRANCH_SITE}
 	rm -r ./*
 	cp -r ../deploy_tmp/* ./
 	rm -rf ../deploy_tmp
+	echo "add for master"
 	git add --all
-	git commit -m '${log}'
+	echo "commit for master"
+	git commit -m "${log}"
 	
 	git push -u origin ${BRANCH_SITE}
 	git push -u origin ${BRANCH_SOURCE}
