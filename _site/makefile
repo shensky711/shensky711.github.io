@@ -10,6 +10,7 @@ else
 #	git add -all
 #	git commit -m $(log)
 #	jekyll build
+	mkdir ../deploy_tmp
 	cp -r _site/ ../deploy_tmp
 	git checkout master
 	rm -r ./*
