@@ -10,7 +10,6 @@ tiled_bg:           false   # Set this true if you want to tile your background 
 #url:                http://taylantatli.me/Moon
 
 # Jekyll
-permalink:          /:title/
 markdown:           kramdown
 highlighter:        rouge
 kramdown:
