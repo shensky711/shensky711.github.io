@@ -1,48 +1,9 @@
-					<style type="text/css">
-						.w {
-							display: inline;
-							padding: 0
-						}
-						
-						.w .x {
-							margin: 30px 0 10px
-						}
-						
-						.w .x .fa {
-							position: relative;
-							margin: 0 5px;
-							font-size: 30px
-						}
-						
-						.w .x .fa .s {
-							position: absolute;
-							display: none;
-							margin-left: -50px;
-							left: 50%;
-							bottom: 130%;
-							width: 100px;
-							height: 100px;
-							background-color: #fff;
-							box-shadow: 0 2px 4px rgba(0, 0, 0, .5)
-						}
-						
-						.w .x .fa .s img {
-							width: 100%
-						}
-						
-						.	x .fa:hover .s {
-							display: block
-						}
-						
-						#bottom-bar .wf-td p fa fa-weixin {
-							display: none;
-						}
-					</style>
 					<hr class="hr-line">
                     <h3 class="title" style="font-size:30px;">
 						{% if site.github %}<a title="github" class="social-btn" href="http://github.com/{{ site.github }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-fw fa-github"></i></a>{% endif %}
                         {% if site.email %}<a title="email" class="social-btn" href="mailto:{{ site.email }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-fw fa-envelope-square"></i></a>{% endif %}
 						{% if site.wechat %}<a title="wechat-todo" class="social-btn" target="_blank" rel="noopener noreferrer"><i class="fa fa-fw fa-weixin"></i></a>{% endif %}
+						{% if site.csdn %}<a title="CSDN" class="social-btn" href="http://blog.csdn.net/{{ site.csdn }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-fw fa-code"></i></a>{% endif %}
                         {% if site.twitter %}<a title="twitter" class="social-btn" href="http://twitter.com/{{ site.twitter }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-fw fa-twitter-square"></i></a>{% endif %}
                         {% if site.facebook %}<a title="facebook" class="social-btn" href="http://facebook.com/{{ site.facebook }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-fw fa-facebook-square"></i></a>{% endif %}
                         {% if site.google.plus %}<a title="google+" class="social-btn" href="http://plus.google.com/+{{ site.google.plus }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-fw fa-google-plus-square"></i></a>{% endif %}
