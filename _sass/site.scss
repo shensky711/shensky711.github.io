@@ -40,7 +40,7 @@ body {
 	min-height: 300px;
 	text-align: left;
 	color: $white;
-	opacity:0.9;
+	opacity:0.99;
 	@media #{$small} {
 		display: block !important;
 	}
@@ -77,7 +77,7 @@ body {
 	padding-left: 15px;
 	@include center-block();
 	background-color: $white;
-	opacity:0.9;
+	opacity:0.99;
 	color: $color_shark;
 	z-index: 1;
 	border-radius: 3px;

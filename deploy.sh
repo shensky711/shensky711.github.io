@@ -34,6 +34,7 @@ else
 	
 	git push -u origin ${BRANCH_SITE}
 	git push -u origin ${BRANCH_SOURCE}
+	git push -u coding coding-pages
 	
 	echo "deploy succeed"
 fi
