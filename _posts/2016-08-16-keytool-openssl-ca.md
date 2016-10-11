@@ -3,6 +3,9 @@ layout: post
 title:  利用keytool、openssl生成证书文件
 excerpt: 利用keytool、openssl生成证书文件
 ---
+
+> 转载请标明出处，本文出自:【HansChen的博客 [http://blog.csdn.net/shensky711](http://blog.csdn.net/shensky711)】
+
 # 用openssl指令逐步生成各个文件
 
  1. 生成服务器密钥：openssl genrsa -out server_private.key 2048

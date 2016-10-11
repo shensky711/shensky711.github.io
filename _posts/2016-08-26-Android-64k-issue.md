@@ -3,6 +3,9 @@ layout: post
 title:  Android最大方法数和解决方案
 excerpt: 随着Android应用功能的增加，代码量不断地增大，当应用方法数量超过了65536的时候，编译的时候便会提示错误
 ---
+
+> 转载请标明出处，本文出自:【HansChen的博客 [http://blog.csdn.net/shensky711](http://blog.csdn.net/shensky711)】
+
 # 什么是64K限制和LinearAlloc限制
 ## 64K限制
 随着Android应用功能的增加，代码量不断地增大，当应用方法数量超过了65536的时候，编译的时候便会提示：

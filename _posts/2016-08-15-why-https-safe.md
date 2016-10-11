@@ -4,6 +4,8 @@ title:  https安全在哪里，原理是什么？
 excerpt: 在通信过程中，https是如何保证通信的安全的？如何加密信息，如何防止中间人攻击？
 ---
 
+> 转载请标明出处，本文出自:【HansChen的博客 [http://blog.csdn.net/shensky711](http://blog.csdn.net/shensky711)】
+
 # Https通信基本过程
 
 在通信过程中，https是如何保证通信的安全的？如何加密信息，如何防止中间人攻击？

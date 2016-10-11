@@ -4,6 +4,8 @@ title:  Android Studio 2.2 NDK开发环境搭建
 excerpt: Android应用程序使用NDK的意义在这里就不说了，本文主要讲解如何在Android Studio 2.2下如何一步步搭建NDK开发环境
 ---
 
+> 转载请标明出处，本文出自:【HansChen的博客 [http://blog.csdn.net/shensky711](http://blog.csdn.net/shensky711)】
+
 Android应用程序使用NDK的意义在这里就不说了，本文主要讲解如何在Android Studio 2.2下如何一步步搭建NDK开发环境。
 
 # 下载NDK和工具
