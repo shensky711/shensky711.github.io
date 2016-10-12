@@ -1,10 +1,11 @@
 # Site
-title:              HansChen
-bio:                '陈航的Github Pages'
-description:        "这家伙有点懒~~~暂时还没有描述"
+title:              'HansChen的博客'
+bio:                '博观而约取，厚积而薄发。'
+description:        '博观而约取，厚积而薄发。'
 reading_time:       true
 words_per_minute:   200
 logo:               'assets/img/logo.png'
+avatar:             'assets/img/avatar.png'
 background:         'assets/img/placeholder-big.jpg'
 tiled_bg:           false   # Set this true if you want to tile your background image, otherwise it will be covered
 #url:                'https://shensky711.github.io'
