@@ -17,24 +17,21 @@ else
 	rm -rf ../deploy_tmp
 	cp -r ./_site ../deploy_tmp
 	
-	echo "add for source"
 	git add --all
-	echo "commit for source"
 	git commit -m "${log}"
 
-	echo "checkout for master"
 	git checkout ${BRANCH_SITE}
 	rm -rf !(.git|.gitignore) ./*
 	cp -r ../deploy_tmp/* ./
 	rm -rf ../deploy_tmp
-	echo "add for master"
+
 	git add --all
-	echo "commit for master"
 	git commit -m "${log}"
 	
 	git push -u origin ${BRANCH_SITE}
 	git push -u origin ${BRANCH_SOURCE}
-	git push -u coding ${BRANCH_SITE}
+
+	git checkout ${BRANCH_SOURCE}
 	
 	echo "deploy succeed"
 fi
