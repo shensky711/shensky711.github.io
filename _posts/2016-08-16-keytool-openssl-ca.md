@@ -1,6 +1,7 @@
 ---
 layout: post
 title:  利用keytool、openssl生成证书文件
+tags: [HansChen,keytool,rsa,非对称加密,证书生成]
 excerpt: 利用keytool、openssl生成证书文件
 ---
 

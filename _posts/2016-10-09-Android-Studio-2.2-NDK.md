@@ -1,6 +1,7 @@
 ---
 layout: post
 title:  Android Studio 2.2 NDK开发环境搭建
+tags: [HansChen,Android Studio NDK,NDK开发,JNI,NDK]
 excerpt: Android应用程序使用NDK的意义在这里就不说了，本文主要讲解如何在Android Studio 2.2下如何一步步搭建NDK开发环境
 ---
 

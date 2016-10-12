@@ -1,6 +1,7 @@
 ---
 layout: post
 title:  MockWebServer使用指南
+tags: [HansChen,MockWebServer使用,okhttp,单元测试]
 excerpt: MockWebServer是square出品的跟随okhttp一起发布，用来Mock服务器行为的库。MockWebServer使用在单元测试中，专门用来测试http请求。其原理是启动了一个本地web server，监听了本地某个端口。所以在测试的时候，需要把请求的url替换为MockWebServer提供的地址，然后web server会handle请求，记录请求，根据预设的stubbing进行反馈
 ---
 
