@@ -21,7 +21,7 @@ else
 	git commit -m "${log}"
 
 	git checkout ${BRANCH_SITE}
-	rm -rf !(.git|.gitignore) ./*
+	rm -rf !(.git|.gitignore|CNAME) ./*
 	cp -r ../deploy_tmp/* ./
 	rm -rf ../deploy_tmp
 
