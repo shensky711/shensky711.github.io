@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  Android最大方法数和解决方案
-tags: [HansChen,Android,multidex,最大方法数]
+tags: [Android,multidex,最大方法数]
 excerpt: 随着Android应用功能的增加，代码量不断地增大，当应用方法数量超过了65536的时候，编译的时候便会提示错误
 ---
 
