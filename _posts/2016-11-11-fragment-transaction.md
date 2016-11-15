@@ -422,4 +422,6 @@ final class BackStackRecord extends FragmentTransaction implements
 ```
 到这一步，提交的事务就被真正执行了，我们知道，即使commit了事务之后，也不是同步执行的，是通过Handler发送到主线程执行的。
 
-所有事务的处理都是在run方法里面执行，但是我们留意到，想要搞清楚add、remove等事务背后真正做了什么，还需要深入了解FragmentManagerImpl。本文主要讲解Fragment事务的流程，FragmentManagerImpl的分析准备放到下一篇分析文章中，相信通过分析之后，就可以对Fragment的生命周期也有一个很好的认识了
+所有事务的处理都是在run方法里面执行，但是我们留意到，想要搞清楚add、remove等事务背后真正做了什么，还需要深入了解FragmentManagerImpl。
+
+本文主要讲解Fragment事务的流程，FragmentManagerImpl的分析准备放到下一篇分析文章[Fragment源码分析](http://blog.csdn.net/shensky711/article/details/53171248)中，相信通过分析之后，就可以对Fragment的生命周期也有一个很好的认识了
