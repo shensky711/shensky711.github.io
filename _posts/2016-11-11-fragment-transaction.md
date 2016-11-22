@@ -11,7 +11,7 @@ excerpt: 在Fragment使用中，有时候需要对Fragment进行add、remove、s
 在Fragment使用中，有时候需要对Fragment进行`add`、`remove`、`show`、`hide`、`replace`等操作来进行Fragment的显示隐藏等管理，这些管理是通过`FragmentTransaction`进行事务管理的。事务管理是对于一系列操作进行管理，一个事务包含一个或多个操作命令，是逻辑管理的工作单元。一个事务开始于第一次执行操作语句，结束于Commit。通俗地将，就是把多个操作缓存起来，等调用commit的时候，统一批处理。下面会对Fragmeng的事务管理做一个代码分析
 
 # 分析入口
-```
+```java
     /**
      * 显示Fragment，如果Fragment已添加过，则直接show，否则构造一个Fragment
      *
@@ -45,7 +45,7 @@ excerpt: 在Fragment使用中，有时候需要对Fragment进行add、remove、s
 
 要管理Fragment事务，首先是需要拿到FragmentManager，在Activity中可以通过`getFragmentManager()`方法获取(使用兼容包的话，通过`FragmentActivity#getSupportFragmentManager()`)，在这里我们就不对兼容包进行分析了
 
-```
+```java
     final FragmentController mFragments = FragmentController.createController(new HostCallbacks());
     
     /**
@@ -57,7 +57,7 @@ excerpt: 在Fragment使用中，有时候需要对Fragment进行add、remove、s
     }
 ```
 FragmentManager是一个抽象类，它是通过mFragments.getFragmentManager()来获取的，mFragments是FragmentController对象，它通过`FragmentController.createController(new HostCallbacks())`生成，这是一个静态工厂方法：
-```
+```java
     public static final FragmentController createController(FragmentHostCallback<?> callbacks) {
         return new FragmentController(callbacks);
     }
@@ -65,7 +65,7 @@ FragmentManager是一个抽象类，它是通过mFragments.getFragmentManager()�
 在这里面直接new了一个FragmentController对象，注意FragmentController的构造方法需要传入一个`FragmentHostCallback`
 
 ## FragmentController构造方法
-```
+```java
     private final FragmentHostCallback<?> mHost;
     private FragmentController(FragmentHostCallback<?> callbacks) {
         mHost = callbacks;
@@ -74,7 +74,7 @@ FragmentManager是一个抽象类，它是通过mFragments.getFragmentManager()�
 构造方法很简单，传入了一个FragmentHostCallback实例
 
 ## FragmentController#getFragmentManager
-```
+```java
     public FragmentManager getFragmentManager() {
         return mHost.getFragmentManagerImpl();
     }
@@ -85,7 +85,7 @@ FragmentManager是一个抽象类，它是通过mFragments.getFragmentManager()�
 这个FragmentHostCallback是一个抽象类，我们可以看到，在Activity中是传入了 `Activity#HostCallbacks`内部类，这个就是FragmentHostCallback的实现类
 
 ## FragmentHostCallback#getFragmentManagerImpl
-```
+```java
     final FragmentManagerImpl mFragmentManager = new FragmentManagerImpl();
     FragmentManagerImpl getFragmentManagerImpl() {
         return mFragmentManager;
@@ -94,7 +94,7 @@ FragmentManager是一个抽象类，它是通过mFragments.getFragmentManager()�
 终于找到FragmentManager的真身`FragmentManagerImpl`了
 
 ## FragmentManagerImpl#beginTransaction
-```
+```java
     @Override
     public FragmentTransaction beginTransaction() {
         return new BackStackRecord(this);
@@ -107,7 +107,7 @@ FragmentManager是一个抽象类，它是通过mFragments.getFragmentManager()�
 下面开始真正的事务管理分析，我们先选择一个事务add来进行分析
 
 ## FragmentTransaction#add
-```
+```java
     public FragmentTransaction add(int containerViewId, Fragment fragment, String tag) {
         doAddOp(containerViewId, fragment, tag, OP_ADD);
         return this;
@@ -169,7 +169,7 @@ add的操作步骤为：
  4. 插入一个类型为OP_ADD的操作到链表最后
 
 这里用到了一个类：
-```
+```java
     static final class Op {
         Op next;//下一操作节点
         Op prev;//上一操作节点
@@ -186,7 +186,7 @@ add的操作步骤为：
 
 ## FragmentTransaction#commit
 等所有操作都插入后，最后我们需要调用FragmentTransaction的commit方法，操作才会真正地执行。
-```
+```java
     public int commit() {
         return commitInternal(false);
     }
@@ -221,7 +221,7 @@ add的操作步骤为：
 ```
 
 ## FragmentManagerImpl#enqueueAction
-```
+```java
     /**
      * Adds an action to the queue of pending actions.
      *
@@ -249,12 +249,12 @@ add的操作步骤为：
     }
 ```
 这里把操作添加到`mPendingActions`列表里去。并通过mHost.getHandler()获取Handler发送执行请求。从上面的分析知道，mHost就是Activity的HostCallbacks，构造方法中把Activity的mHandler传进去了，这里执行的`mHost.getHandler()`获取到的也就是Activity中的mHandler，这样做是因为需要在主线程中执行
-```
+```java
 final Handler mHandler = new Handler();
 ```
 
 再看看mExecCommit中做了什么操作：
-```
+```java
     Runnable mExecCommit = new Runnable() {
         @Override
         public void run() {
@@ -313,7 +313,7 @@ final Handler mHandler = new Handler();
     }
 ```
 插入了事物之后，就是在主线程中把需要处理的事务统一处理，处理事务是通过执行`mTmpActions[i].run()`进行的，这个mTmpActions[i]就是前面我们通过enqueueAction方法插入的BackStackRecord，童鞋们可能没注意到，它可是一个Runnable，我们来看看它的定义
-```
+```java
 final class BackStackRecord extends FragmentTransaction implements
         FragmentManager.BackStackEntry, Runnable {
     static final String TAG = FragmentManagerImpl.TAG;
@@ -324,7 +324,7 @@ final class BackStackRecord extends FragmentTransaction implements
 兜兜转转，我们又回到了BackStackRecord
 
 ## BackStackRecord#run
-```
+```java
     public void run() {
     
         ......

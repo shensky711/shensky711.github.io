@@ -13,14 +13,14 @@ excerpt: 动态代理是java的一大特性，动态代理的优势就是实现�
 
 # 静态代理
 首先你有一个接口：
-```
+```java
 public interface Api {
 
     String doSomething(String input);
 }
 ```
 这个接口有一个原始的实现：
-```
+```java
 public class ApiImpl implements Api {
 
     @Override
@@ -30,7 +30,7 @@ public class ApiImpl implements Api {
 }
 ```
 现在问题来了，有一个新的需求，我需要在所有调用`doSomething`的地方都添加一个log，那怎么办呢？我们当然可以在原有代码上直接加上log，但是ApiImpl里面的log真的是那段代码需要的吗？如果不修改原有代码，能不能实现？当然可以，如，我们添加一个代理类：
-```
+```java
 public class ApiProxy implements Api {
 
     private Api mBase;
@@ -55,7 +55,7 @@ public class ApiProxy implements Api {
  - 项目中有100个类，需要为每个类的方法都添加log
 
 对于第一种情况，如果使用静态代理，那就只能这样了：
-```
+```java
 public class ApiProxy implements Api {
 
     private Api mBase;
@@ -84,7 +84,7 @@ public class ApiProxy implements Api {
 JDK提供了动态代理方式，可以简单理解为JVM可以在运行时帮我们动态生成一系列的代理类，这样我们就不需要手写每一个静态的代理类了，比如:
 
 1. 实现InvocationHandler
-```
+```java
 public class ApiHandler implements InvocationHandler {
 
     private Api mBase;
@@ -111,7 +111,7 @@ public class ApiHandler implements InvocationHandler {
 ```
 
 2. 动态创建代理类
-```
+```java
     private static void proxyTest() {
         ClassLoader loader = Api.class.getClassLoader();//加载代理类的ClassLoader
         Class[] interfaces = new Class[]{Api.class};//需要代理的接口

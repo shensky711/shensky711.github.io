@@ -35,7 +35,7 @@ Java VM是多线程的 ，所以native libraries应该用多线程编译器来�
 
 ## 加载
 native库通过`System.loadLibrary`方法进行加载。如：
-```
+```java
 package pkg;  
 
 class Cls { 
@@ -43,7 +43,7 @@ class Cls {
      native double f(int i, String s); 
      
      static { 
-         System.loadLibrary(“pkg_Cls”); 
+         System.loadLibrary("pkg_Cls"); 
      } 
 } 
 ```
@@ -88,7 +88,7 @@ class Cls {
 | objects | 以"L"开头，以";"结尾，中间是用"/" 隔开的包及类名。比如：`Ljava/lang/String;`如果是嵌套类，则用`$`来表示嵌套。例如 "`(Ljava/lang/String;Landroid/os/FileUtils$FileStatus;)Z`" |
 
 ## 举例
-```
+```java
 package pkg;  
 
 class Cls { 
@@ -106,7 +106,7 @@ class Cls {
  - 第二个参数取决于native method是否静态方法，如果是非静态方法，那么第二个参数是对对象的引用，如果是静态方法，则第二个参数是对它的class类的引用
  - 剩下的参数跟Java方法参数一一对应
 
-```
+```java
 package pkg;  
 
 class Cls { 
@@ -117,7 +117,7 @@ class Cls {
 
 }
 ```
-```
+```c
 //注意，c和c++在使用JNI接口的时候有点不一致，请仔细观察通过env调用接口的调用方式
 //C版本
 jdouble Java_pkg_Cls_f__ILjava_lang_String_2 (
@@ -185,8 +185,8 @@ JNI中使用的引用可以划分为三类：`全局引用`、`局部引用`和`
 # 访问字段和方法
 
 JNI允许native代码访问对象的成员以及调用它的方法，通过两个步骤即可实现访问，比如，我们需要调用`cls`中的`f`方法：
-```
-jmethodID mid = env->GetMethodID(cls, “f”, “(ILjava/lang/String;)D”);//mid可以重复使用
+```java
+jmethodID mid = env->GetMethodID(cls, "f", "(ILjava/lang/String;)D");//mid可以重复使用
 jdouble result = env->CallDoubleMethod(obj, mid, 10, str);
 ```
 
@@ -223,7 +223,7 @@ JNI允许本地方法抛出处理任何异常，也可以处理Java中抛出的�
  - 在本地方法中调用`ExceptionClear()`清除异常，处理接下来的逻辑
 
 异常抛出的时，本地方法需清除异常后，才能继续调用其他JNI接口方法，有异常发生后，只有以下方法才能被安全调用：
-```
+```java
   ExceptionOccurred()
   ExceptionDescribe()
   ExceptionClear()
@@ -255,7 +255,7 @@ JNI允许本地方法抛出处理任何异常，也可以处理Java中抛出的�
 | void | void | N/A |
 
 JNI中还定义了以下两个宏定义方便使用：
-```
+```c
 #define JNI_FALSE  0 
 #define JNI_TRUE   1 
 ```
@@ -267,7 +267,7 @@ JNI为不同的java对象提供了不同的引用类型，JNI引用类型如下�
 
 # 字段和方法ID
 在C中，字段和方法ID是一个指向结构体的指针
-```
+```c
 struct _jfieldID;                       /* opaque structure */
 typedef struct _jfieldID* jfieldID;     /* field IDs */
 
@@ -277,7 +277,7 @@ typedef struct _jmethodID* jmethodID;   /* method IDs */
 
 # 值类型
 值类型`jvalue `是一个联合体结构，定义如下：
-```
+```c
 typedef union jvalue {
     jboolean    z;
     jbyte       b;
@@ -294,7 +294,7 @@ typedef union jvalue {
 # 签名类型描述
 请参考：[java字段描述符](#java_signatures)
 如：
-```
+```java
 //方法签名为：(ILjava/lang/String;[I)J 
 long f (int n, String s, int[] arr);
 ```
@@ -309,7 +309,7 @@ JNI的 UTF-8与标准的 UTF-8格式有两个区别：
 在下面的说明中，`必须`说明JNI函数必须接受一个非空对象，你必须保证传入的参数不为空，JNI函数不需要再对它进行空指针判断
 
 ## 返回码说明
-```
+```c
 #define JNI_OK          (0)         /* no error */
 #define JNI_ERR         (-1)        /* generic error */
 #define JNI_EDETACHED   (-2)        /* thread detached from the VM */
@@ -320,7 +320,7 @@ JNI的 UTF-8与标准的 UTF-8格式有两个区别：
 ```
 
 ## 接口详细
-```
+```c
     /**
      * 返回本地方法接口的版本
      *
