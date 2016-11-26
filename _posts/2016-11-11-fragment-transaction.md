@@ -5,8 +5,6 @@ tags: [Fragment,事务管理,transaction,源码分析]
 excerpt: 在Fragment使用中，有时候需要对Fragment进行add、remove、show、hide、replace等操作来进行Fragment的显示隐藏等管理，这些管理是通过FragmentTransaction进行事务管理的
 ---
 
-> 转载请标明出处，本文出自:【HansChen的博客 [http://blog.csdn.net/shensky711](http://blog.csdn.net/shensky711)】
-
 # 概述
 在Fragment使用中，有时候需要对Fragment进行`add`、`remove`、`show`、`hide`、`replace`等操作来进行Fragment的显示隐藏等管理，这些管理是通过`FragmentTransaction`进行事务管理的。事务管理是对于一系列操作进行管理，一个事务包含一个或多个操作命令，是逻辑管理的工作单元。一个事务开始于第一次执行操作语句，结束于Commit。通俗地将，就是把多个操作缓存起来，等调用commit的时候，统一批处理。下面会对Fragmeng的事务管理做一个代码分析
 
