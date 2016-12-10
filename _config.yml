@@ -11,7 +11,7 @@ tiled_bg:           false   # Set this true if you want to tile your background 
 #locale:             en_US
 url:                'https://shensky711.github.io'
 #url:                'http://www.hanschen.site'
-#url:                'http://shensky711.coding.me'
+#url:                'https://shensky711.coding.me'
 
 # Jekyll
 markdown:           kramdown
