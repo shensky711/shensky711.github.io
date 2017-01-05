@@ -24,7 +24,7 @@
     <!-- push to baidu -->
     <script>
     (function(){
-        var bp = document.createElement('script');
+        var bp = document.createElement('pushToBauduScript');
         var curProtocol = window.location.protocol.split(':')[0];
         if (curProtocol === 'https') {
             bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
@@ -32,22 +32,43 @@
         else {
             bp.src = 'http://push.zhanzhang.baidu.com/push.js';
         }
-        var s = document.getElementsByTagName("script")[0];
+        var s = document.getElementsByTagName("pushToBauduScript")[0];
         s.parentNode.insertBefore(bp, s);
     })();
-	var _hmt = _hmt || [];
-	(function() {
-	  var hm = document.createElement("baiduGitHubPagesScript");
-	  hm.src = "https://hm.baidu.com/hm.js?cae9425eed9e207f553597421f71ddad";
-	  var s = document.getElementsByTagName("baiduGitHubPagesScript")[0]; 
-	  s.parentNode.insertBefore(hm, s);
-	})();
-	var _hmt = _hmt || [];
-	(function() {
-	  var hm = document.createElement("baiduCodingPagesScript");
-	  hm.src = "https://hm.baidu.com/hm.js?0fc92b660c12a36156ab90e9d7d2c927";
-	  var s = document.getElementsByTagName("baiduCodingPagesScript")[0]; 
-	  s.parentNode.insertBefore(hm, s);
-	})();
     </script>
+	
+	<!-- Baidu Analytics -->
+	{% if site.url == 'http://www.hanschen.site' %}
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "https://hm.baidu.com/hm.js?cae9425eed9e207f553597421f71ddad";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+	
+	{% elsif site.url == 'https://shensky711.github.io' %}
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "https://hm.baidu.com/hm.js?73529810f11fe1f64b2b11dc66add285";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+	
+	{% elsif site.url == 'https://shensky711.coding.me' %}
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "https://hm.baidu.com/hm.js?0fc92b660c12a36156ab90e9d7d2c927";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+	{% endif %}
 
