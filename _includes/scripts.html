@@ -24,7 +24,7 @@
     <!-- push to baidu -->
     <script>
     (function(){
-        var bp = document.createElement('pushToBauduScript');
+        var bp = document.createElement('script');
         var curProtocol = window.location.protocol.split(':')[0];
         if (curProtocol === 'https') {
             bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
@@ -32,13 +32,12 @@
         else {
             bp.src = 'http://push.zhanzhang.baidu.com/push.js';
         }
-        var s = document.getElementsByTagName("pushToBauduScript")[0];
+        var s = document.getElementsByTagName("script")[0];
         s.parentNode.insertBefore(bp, s);
     })();
     </script>
 	
 	<!-- Baidu Analytics -->
-	{% if site.url == 'http://www.hanschen.site' %}
 	<script>
 	var _hmt = _hmt || [];
 	(function() {
@@ -49,7 +48,6 @@
 	})();
 	</script>
 	
-	{% elsif site.url == 'https://shensky711.github.io' %}
 	<script>
 	var _hmt = _hmt || [];
 	(function() {
@@ -60,7 +58,6 @@
 	})();
 	</script>
 	
-	{% elsif site.url == 'https://shensky711.coding.me' %}
 	<script>
 	var _hmt = _hmt || [];
 	(function() {
@@ -70,5 +67,4 @@
 	  s.parentNode.insertBefore(hm, s);
 	})();
 	</script>
-	{% endif %}
 
