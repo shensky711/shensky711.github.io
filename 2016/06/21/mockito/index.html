@@ -61,7 +61,7 @@
 </script>
 
   <meta name="description" content="mock和Mockito的关系在软件开发中提及”mock”，通常理解为模拟对象。 为什么需要模拟? 在我们一开始学编程时,我们所写的对象通常都是独立的，并不依赖其他的类，也不会操作别的类。但实际上，软件中是充满依赖关系的，比如我们会基于service类写操作类,而service类又是基于数据访问类(DAO)的，依次下去，形成复杂的依赖关系。 单元测试的思路就是我们想在不涉及依赖关系的情况下测试代码">
-<meta name="keywords" content="mock,单元测试,Mockito">
+<meta name="keywords" content="mock,Mockito,单元测试">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Mockito使用指南 - 单元测试的正确姿势">
 <meta property="og:url" content="http://blog.hanschen.site/2016/06/21/mockito/index.html">
@@ -333,6 +333,24 @@
                 <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
               </span>
             </span>
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">评论数：</span>
+    
+  
+    <a href="/2016/06/21/mockito/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2016/06/21/mockito/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
           <br>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -496,9 +514,9 @@
         <div class="post-tags">
             <a href="/tags/mock/" rel="tag"># mock</a>
           
-            <a href="/tags/单元测试/" rel="tag"># 单元测试</a>
-          
             <a href="/tags/Mockito/" rel="tag"># Mockito</a>
+          
+            <a href="/tags/单元测试/" rel="tag"># 单元测试</a>
           
         </div>
         <div class="post-nav">
@@ -530,6 +548,9 @@
 
           </div>
           
+    
+    <div class="comments" id="comments"></div>
+  
 
 
         </div>
@@ -930,6 +951,30 @@
 
 
 
+
+    
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+
+<script>
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: true,
+    appId: 'ST1hmgzJfF6c44BNUyK56qad-gzGzoHsz',
+    appKey: 'Wy4dwHBHU556tTDardpzBI3i',
+    placeholder: '说点什么吧~',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: false,
+    lang: '' || 'zh-cn'
+  });
+</script>
 
 
 </body>
