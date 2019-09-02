@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+  <meta name="google-site-verification" content="bMH0URCoOdzdhSMyGeDuGebWiSxHnJsOLundsaPEZbc">
+  <meta name="msvalidate.01" content="EC8F55291A196E9DD39DDDB134E93A69">
+  <meta name="baidu-site-verification" content="QC6bRBu8qm">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    }
+  };
+</script>
+
+  <meta name="description" content="什么是64K限制和LinearAlloc限制64K限制随着Android应用功能的增加，代码量不断地增大，当应用方法数量超过了65536的时候，编译的时候便会提示： 这个Android著名的Dex 64k method数量上限。那么，是什么原因导致方法数不能超过64K呢？网上搜集了一下资料，原因一般有：  DexOpt优化的限制：当Android系统启动一个应用的时候，有一步是对Dex进行优化，这">
+<meta name="keywords" content="Android,multidex,最大方法数">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android最大方法数和解决方案">
+<meta property="og:url" content="http://blog.hanschen.site/2016/08/26/Android-64k-issue/index.html">
+<meta property="og:site_name" content="HansChen 的博客">
+<meta property="og:description" content="什么是64K限制和LinearAlloc限制64K限制随着Android应用功能的增加，代码量不断地增大，当应用方法数量超过了65536的时候，编译的时候便会提示： 这个Android著名的Dex 64k method数量上限。那么，是什么原因导致方法数不能超过64K呢？网上搜集了一下资料，原因一般有：  DexOpt优化的限制：当Android系统启动一个应用的时候，有一步是对Dex进行优化，这">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/shensky711/Pictures/master/2019-9-2-10-54-5.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/shensky711/Pictures/master/2019-9-2-10-54-23.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/shensky711/Pictures/master/2019-9-2-10-54-35.png">
+<meta property="og:updated_time" content="2019-09-02T06:30:29.822Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android最大方法数和解决方案">
+<meta name="twitter:description" content="什么是64K限制和LinearAlloc限制64K限制随着Android应用功能的增加，代码量不断地增大，当应用方法数量超过了65536的时候，编译的时候便会提示： 这个Android著名的Dex 64k method数量上限。那么，是什么原因导致方法数不能超过64K呢？网上搜集了一下资料，原因一般有：  DexOpt优化的限制：当Android系统启动一个应用的时候，有一步是对Dex进行优化，这">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/shensky711/Pictures/master/2019-9-2-10-54-5.png">
+  <link rel="alternate" href="/atom.xml" title="HansChen 的博客" type="application/atom+xml">
+  <link rel="canonical" href="http://blog.hanschen.site/2016/08/26/Android-64k-issue/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Android最大方法数和解决方案 | HansChen 的博客</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HansChen 的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.hanschen.site/2016/08/26/Android-64k-issue/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="chenhang">
+      <meta itemprop="description" content="博观而约取，厚积而薄发。">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HansChen 的博客">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">Android最大方法数和解决方案
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2016-08-26 00:00:00" itemprop="dateCreated datePublished" datetime="2016-08-26T00:00:00+08:00">2016-08-26</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-02 14:30:29" itemprop="dateModified" datetime="2019-09-02T14:30:29+08:00">2019-09-02</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/" itemprop="url" rel="index"><span itemprop="name">Android</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">2.4k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">2 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="什么是64K限制和LinearAlloc限制"><a href="#什么是64K限制和LinearAlloc限制" class="headerlink" title="什么是64K限制和LinearAlloc限制"></a>什么是64K限制和LinearAlloc限制</h1><h2 id="64K限制"><a href="#64K限制" class="headerlink" title="64K限制"></a>64K限制</h2><p>随着Android应用功能的增加，代码量不断地增大，当应用方法数量超过了65536的时候，编译的时候便会提示：<br><img src="https://raw.githubusercontent.com/shensky711/Pictures/master/2019-9-2-10-54-5.png" alt="2019-9-2-10-54-5.png"></p>
+<p>这个Android著名的Dex 64k method数量上限。那么，是什么原因导致方法数不能超过64K呢？网上搜集了一下资料，原因一般有：</p>
+<ol>
+<li><strong>DexOpt优化的限制</strong>：当Android系统启动一个应用的时候，有一步是对Dex进行优化，这个过程有一个专门的工具来处理，叫DexOpt。DexOpt的执行过程是在第一次加载Dex文件的时候执行的。这个过程会生成一个ODEX文件，即Optimised Dex。执行ODex的效率会比直接执行Dex文件的效率要高很多。但是在早期的Android系统中，DexOpt有一个问题，也就是这篇文章想要说明并解决的问题。DexOpt会把每一个类的方法id检索起来，存在一个链表结构里面。但是这个链表的长度是用一个short类型来保存的，导致了方法id的数目不能够超过65536个。当一个项目足够大的时候，显然这个方法数的上限是不够的。尽管在新版本的Android系统中，DexOpt修复了这个问题，但是我们仍然需要对老系统做兼容</li>
+<li><strong>dalvik bytecode的限制</strong>：因为 Dalvik 的 invoke-kind 指令集中，method reference index 只留了 16 bits，最多能引用 65535 个方法，参考链接：<a href="http://stackoverflow.com/questions/21490382/does-the-android-art-runtime-have-the-same-method-limit-limitations-as-dalvik/21492160#21492160，http://source.android.com/devices/tech/dalvik/dalvik-bytecode.html" target="_blank" rel="noopener">http://stackoverflow.com/questions/21490382/does-the-android-art-runtime-have-the-same-method-limit-limitations-as-dalvik/21492160#21492160，http://source.android.com/devices/tech/dalvik/dalvik-bytecode.html</a></li>
+</ol>
+<p>鉴于以上原因，在打包Android应用的时候，会对方法数做一个检测，当方法数超过了DexFormat.MAX_MEMBER_IDX（定义为0Xffff, 注意，这个<strong>不是Dex文件格式的限制</strong>，Dex文件中存储方法ID用的并不是short类型，无论最新的DexFile.h新定义的u4是uint32_t，还是老版本DexFile引用的vm/Common.h里定义的u4是uint32或者unsigned int，都不是short类型，特此说明）便报错</p>
+<a id="more"></a>
+
+<h2 id="LinearAlloc限制"><a href="#LinearAlloc限制" class="headerlink" title="LinearAlloc限制"></a>LinearAlloc限制</h2><p>即使方法数没有超过65536，能正常编译打包成apk，在安装的时候，也有可能会提示INSTALL_FAILED_DEXOPT而导致安装失败，这个一般就是因为LinearAlloc的限制导致的。这个主要是因为Dexopt 使用 LinearAlloc 来存储应用的方法信息。Dalvik LinearAlloc 是一个固定大小的缓冲区。在Android 版本的历史上，LinearAlloc 分别经历了4M/5M/8M/16M限制。Android 2.2和2.3的缓冲区只有5MB，Android 4.x提高到了8MB 或16MB。当方法数量过多导致超出缓冲区大小时，也会造成dexopt崩溃</p>
+<h1 id="谷歌分包方案"><a href="#谷歌分包方案" class="headerlink" title="谷歌分包方案"></a>谷歌分包方案</h1><p>谷歌提供了一个multiDex的分包方案，当方法数超过65536的时候，生成多个dex文件，把应用启动时必须用到的类和该类的直接引用类放到main dex中，把其他类放到second dex中。当应用启动之后，动态加载second dex，从而避免64k问题。使用Android Studio很容易实现分包方案：<br><img src="https://raw.githubusercontent.com/shensky711/Pictures/master/2019-9-2-10-54-23.png" alt="2019-9-2-10-54-23.png"></p>
+<ol>
+<li>在build.gradle中添加：multiDexEnabled true</li>
+<li>加入依赖‘compile ‘com.android.support:multidex:1.0.1’’</li>
+<li>让应用的Application类直接使用或者继承MultiDexApplication</li>
+<li>如果你想使用自定义的Application，又不想继承MultiDexApplication，那么可以在attachBaseContext方法里执行MultiDex.install(base)</li>
+</ol>
+<p>以上就是谷歌multiDex方案所需做的设置，通过配置multiDex，便可解决64k方法数限制</p>
+<h1 id="谷歌multiDex存在的问题"><a href="#谷歌multiDex存在的问题" class="headerlink" title="谷歌multiDex存在的问题"></a>谷歌multiDex存在的问题</h1><p>虽然谷歌的分包方案很简单，但是效果并不是那么好，谷歌本身也枚举了分包方案的<strong>缺点</strong>：</p>
+<ol>
+<li>如果在主线程中执行MultiDex.install，加载second dex，因为加载从dex是同步的，会阻塞线程，second dex太大的话，有可能导致ANR</li>
+<li>API Level 14之前，由于Dalvik LinearAlloc bug（问题22586，就是上文提到的LinearAlloc问题），很可能会出问题的</li>
+<li>应用程序使用了multiedex配置的，会造成使用比较大的内存</li>
+<li>对于应用程序比较复杂的，存在较多的library的项目。multidex可能会造成不同依赖项目间的dex文件函数相互调用，找不到方法</li>
+</ol>
+<h1 id="如何解决谷歌分包方案的问题"><a href="#如何解决谷歌分包方案的问题" class="headerlink" title="如何解决谷歌分包方案的问题"></a>如何解决谷歌分包方案的问题</h1><p>针对上面的问题，参考网上的一些解决方案，如美团、facebook、微信等，初步使用的解决方法如下：</p>
+<ol>
+<li>第一次启动的时候，检测到未曾加载过second dex，那么启动欢迎页面（启动新的进程，原来进程进入阻塞等待，注意，此时不会发生ANR，因为已经不是前台进程了），在欢迎页面里面进行second dex的加载，加载完成后通知主线程继续</li>
+<li>设定单个dex文件最大方法数为48000（经验值）而不是65536，避免内存问题</li>
+<li>同上</li>
+<li>控制程序逻辑，未曾加载完second dex之前，进入阻塞等待，直到加载完程序才往下走</li>
+</ol>
+<p>下面是流程图：</p>
+<p><img src="https://raw.githubusercontent.com/shensky711/Pictures/master/2019-9-2-10-54-35.png" alt="2019-9-2-10-54-35.png"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/multidex/" rel="tag"># multidex</a>
+          
+            <a href="/tags/最大方法数/" rel="tag"># 最大方法数</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2016/08/17/makefile/" rel="next" title="Makefile使用指南">
+                <i class="fa fa-chevron-left"></i> Makefile使用指南
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2016/08/30/lua-guide/" rel="prev" title="Lua快速入门">
+                Lua快速入门 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.png"
+      alt="chenhang">
+  <p class="site-author-name" itemprop="name">chenhang</p>
+  <div class="site-description motion-element" itemprop="description">博观而约取，厚积而薄发。</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">58</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/shensky711" title="GitHub &rarr; https://github.com/shensky711" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:shensky711@gmail.com" title="E-Mail &rarr; mailto:shensky711@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是64K限制和LinearAlloc限制"><span class="nav-number">1.</span> <span class="nav-text">什么是64K限制和LinearAlloc限制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#64K限制"><span class="nav-number">1.1.</span> <span class="nav-text">64K限制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LinearAlloc限制"><span class="nav-number">1.2.</span> <span class="nav-text">LinearAlloc限制</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#谷歌分包方案"><span class="nav-number">2.</span> <span class="nav-text">谷歌分包方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#谷歌multiDex存在的问题"><span class="nav-number">3.</span> <span class="nav-text">谷歌multiDex存在的问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#如何解决谷歌分包方案的问题"><span class="nav-number">4.</span> <span class="nav-text">如何解决谷歌分包方案的问题</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">chenhang</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">234k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">3:33</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
