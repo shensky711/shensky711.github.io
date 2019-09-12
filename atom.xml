@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.hanschen.site/"/>
-  <updated>2019-09-02T06:30:29.829Z</updated>
+  <updated>2019-09-12T09:13:53.797Z</updated>
   <id>http://blog.hanschen.site/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>AOSP 编译和烧写</title>
+    <link href="http://blog.hanschen.site/2019/09/12/aosp_compile_and_flash/"/>
+    <id>http://blog.hanschen.site/2019/09/12/aosp_compile_and_flash/</id>
+    <published>2019-09-11T16:00:00.000Z</published>
+    <updated>2019-09-12T09:13:53.797Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="1-简介"><a href="#1-简介" class="headerlink" title="1. 简介"></a>1. 简介</h1><p>很多 Android 开发者都会希望编译 Android 源码并刷进自己的手机里面，但网上教程很多都仅仅是告诉你 lunch、make 等等，但你手里有一台设备时却发现，你编译出的镜像由于驱动关系是不能直接烧进手机的。这里整理了一下步骤，帮助大家可以按照流程编译并烧写镜像。</p><p>本篇文章以 <strong>Pixel 2 &amp;&amp; Android 10</strong> 为例</p><h1 id="2-环境准备"><a href="#2-环境准备" class="headerlink" title="2. 环境准备"></a>2. 环境准备</h1><p>这块没啥说，官方教程就够了，参考：<a href="https://source.android.com/setup/build/initializing" target="_blank" rel="noopener">https://source.android.com/setup/build/initializing</a> 就行了</p><h1 id="3-源码下载"><a href="#3-源码下载" class="headerlink" title="3. 源码下载"></a>3. 源码下载</h1><ol><li>根据 <a href="https://developers.google.com/android/drivers" target="_blank" rel="noopener">https://developers.google.com/android/drivers</a> 选择一个设备对应 Android 版本号和驱动，比如我们选择：Android 10.0.0 (QP1A.190711.020)，下载驱动，记住 <strong>Build 号</strong><br><img src="https://raw.githubusercontent.com/shensky711/Pictures/master/2019-9-12-16-53-40.png" alt="2019-9-12-16-53-40.png"></li></ol><ol start="2"><li><p>在 <a href="https://source.android.com/setup/start/build-numbers" target="_blank" rel="noopener">https://source.android.com/setup/start/build-numbers</a> 查找 QP1A.190711.020 对应的分支：android-10.0.0_r2，记住<strong>分支名</strong><br><img src="https://raw.githubusercontent.com/shensky711/Pictures/master/2019-9-12-16-56-41.png" alt="2019-9-12-16-56-41.png"></p></li><li><p>下载 AOSP 源码<br>注意在下载 aosp 前要安装 repo 工具，参考：<a href="https://source.android.com/setup/build/downloading" target="_blank" rel="noopener">https://source.android.com/setup/build/downloading</a></p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mkdir Pixel2</span><br><span class="line"><span class="built_in">cd</span> Pixel2</span><br><span class="line">repo init -u https://android.googlesource.com/platform/manifest -b android-10.0.0_r2 --depth=1</span><br><span class="line">repo sync -j8</span><br><span class="line">repo start android-10.0.0_r2 --all</span><br></pre></td></tr></table></figure></li><li><p>把步骤1中选中的两个驱动下载到 aosp 源码根目录并解压</p></li><li><p>分别执行解压后的文件，注意，执行后要同意 License，确保正确解压到 aosp 根目录的 vendor 目录</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./extract-qcom-walleye.sh</span><br><span class="line">./extract-google_devices-walleye.sh</span><br></pre></td></tr></table></figure></li></ol><h1 id="4-源码编译"><a href="#4-源码编译" class="headerlink" title="4. 源码编译"></a>4. 源码编译</h1><ol><li>在 aosp 源码根目录执行：source build/envsetup.sh（注意，执行前终端请选bash，不要使用zsh等，在终端键入bash回车即可）</li><li>在 aosp 源码根目录执行：lunch</li><li>选择对应的版本，比如 Pixel2 就选择：aosp_walleye-userdebug</li><li>执行：make -j8</li></ol><h1 id="5-镜像烧写"><a href="#5-镜像烧写" class="headerlink" title="5. 镜像烧写"></a>5. 镜像烧写</h1><ol><li>编译完后，执行：<code>export ANDROID_PRODUCT_OUT=/home/chenhang/source/Pixel2/out/target/product/walleye</code></li><li>执行：<code>fastboot flashall -w</code></li><li>烧写完成后，执行：<code>fastboot reboot</code></li></ol><h1 id="6-Gapps-安装"><a href="#6-Gapps-安装" class="headerlink" title="6. Gapps 安装"></a>6. Gapps 安装</h1><p>编译出来的 aosp 默认没有 google 全家桶，可以通过以下方式进行安装</p><ol><li>在 <a href="https://opengapps.org/" target="_blank" rel="noopener">https://opengapps.org/</a> 根据系统版本、芯片类型选择需要的 Gapps 全家桶，可以选 stock 版本</li><li>下载后把全家桶 push 到手机 sdcard（不用解压）</li><li>在 <a href="https://twrp.me/devices/" target="_blank" rel="noopener">https://twrp.me/devices/</a> 搜索你的设备，如： <a href="https://twrp.me/google/googlepixel2.html" target="_blank" rel="noopener">https://twrp.me/google/googlepixel2.html</a><br><img src="https://raw.githubusercontent.com/shensky711/Pictures/master/2019-9-12-17-3-22.png" alt="2019-9-12-17-3-22.png"></li><li>下载 twrp.img 后根据截图中的命令，把 twrp 加载到手机， 选择 install 刷入 twrp.zip (这是一个 recovery 版本)，重启后，通过 adb reboot recovery 进入 twrp 的recovery 系统</li><li>在手机上选择 install， 选择步骤2中 push 到手机 sdcard 的全家桶，安装结束后选择擦除 dalvik cache 和 cache，重启即可</li></ol>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;1-简介&quot;&gt;&lt;a href=&quot;#1-简介&quot; class=&quot;headerlink&quot; title=&quot;1. 简介&quot;&gt;&lt;/a&gt;1. 简介&lt;/h1&gt;&lt;p&gt;很多 Android 开发者都会希望编译 Android 源码并刷进自己的手机里面，但网上教程很多都仅仅是告诉你 lun
+      
+    
+    </summary>
+    
+      <category term="Android" scheme="http://blog.hanschen.site/categories/Android/"/>
+    
+    
+      <category term="Android" scheme="http://blog.hanschen.site/tags/Android/"/>
+    
+  </entry>
   
   <entry>
     <title>Protocol Buffers 手册</title>
@@ -399,9 +424,9 @@
       <category term="Android" scheme="http://blog.hanschen.site/categories/Android/"/>
     
     
-      <category term="jni" scheme="http://blog.hanschen.site/tags/jni/"/>
-    
       <category term="java" scheme="http://blog.hanschen.site/tags/java/"/>
+    
+      <category term="jni" scheme="http://blog.hanschen.site/tags/jni/"/>
     
       <category term="java native interface specification" scheme="http://blog.hanschen.site/tags/java-native-interface-specification/"/>
     
@@ -600,52 +625,6 @@
       <category term="makefile教程" scheme="http://blog.hanschen.site/tags/makefile%E6%95%99%E7%A8%8B/"/>
     
       <category term="makefile" scheme="http://blog.hanschen.site/tags/makefile/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>利用keytool、openssl生成证书文件</title>
-    <link href="http://blog.hanschen.site/2016/08/16/keytool-openssl-ca/"/>
-    <id>http://blog.hanschen.site/2016/08/16/keytool-openssl-ca/</id>
-    <published>2016-08-15T16:00:00.000Z</published>
-    <updated>2019-09-02T06:30:29.822Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="用openssl指令逐步生成各个文件"><a href="#用openssl指令逐步生成各个文件" class="headerlink" title="用openssl指令逐步生成各个文件"></a>用openssl指令逐步生成各个文件</h1><ol><li><p>生成服务器密钥：openssl genrsa -out server_private.key 2048</p></li><li><p>从密钥生成公钥（非必须）：openssl rsa -in server_private.key -pubout &gt; server_public.key</p></li><li><p>生成证书请求文件，这里会让你输入一堆信息，比如组织名称、个人信息等：openssl req -new -key server_private.key -out server_req.csr</p></li><li><p>初始化CA环境</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mkdir demoCA</span><br><span class="line">cd demoCA</span><br><span class="line">mkdir certs crl newcerts</span><br><span class="line">touch index.txt serial</span><br><span class="line">echo 00 &gt; serial</span><br><span class="line">cd ..</span><br></pre></td></tr></table></figure></li><li><p>生成ca密钥：openssl genrsa -out ca.key 2048</p></li><li><p>生成ca证书：openssl req -new -x509 -key ca.key -out ca.crt</p></li><li><p>用ca对服务器证书请求文件进行签名:openssl ca -in server_req.csr -out server.crt -cert ca.crt -keyfile ca.key -config /usr/ssl/openssl.cnf</p></li><li><p>可以把服务端的私钥和已签名的证书合并到一个pkcs12格式的文件：openssl pkcs12 -export -out server.pfx -inkey server_private.key -in server.crt  </p></li><li><p>也可以把pkcs12格式转化为java常用的jks格式：keytool -importkeystore -v -srckeystore server.pfx -srcstoretype pkcs12 -srcstorepass 123456 -destkeystore server.jks -deststoretype jks -deststorepass 123456</p></li></ol><a id="more"></a><h1 id="用keytool生成"><a href="#用keytool生成" class="headerlink" title="用keytool生成"></a>用keytool生成</h1><p>keytool主要可以帮我们：</p><ol><li>创建一个新的JKS(Java Key Store)文件（里面包含了一个新生成的服务器密钥）</li><li>导出一个CSR(Certificate Signung Request)证书申请文件</li><li>导入一个签名后的证书文件到jks文件中</li></ol><p>以下是操作步骤：</p><ol><li>生成新的jks文件：keytool -genkeypair -alias server -keyalg RSA -keystore server.jks</li><li>到出证书请求文件：keytool -certreq -alias server -file server.csr -keystore server.jks</li><li>用ca对请求文件进行签名（ca的生成请参考上面）：openssl ca -in server.csr -out server.crt -cert ca.crt -keyfile ca.key -config demoCA/config/openssl.cnf</li><li>导入已签名的证书到jks：keytool -importcert -alias server -file server.crt -keystore server.jks</li></ol><p>这样，我们就得到了一个包含了服务器密钥以及已签名证书的jks文件了</p><h1 id="最终生成的文件"><a href="#最终生成的文件" class="headerlink" title="最终生成的文件"></a>最终生成的文件</h1><p>最终服务端需要用到的文件有：</p><ol><li>服务器私钥</li><li>经过CA签名的证书（包含服务器公钥、基本信息）</li></ol><p>客户端需要用到的文件有：</p><ol><li>CA的证书（包含了CA的公钥，用以对服务器的证书解密，校验证书真伪）</li></ol><blockquote><p>有些服务器配置可以使用私钥+证书合并在一起的文件，如jks或者pkcs12文件，这类文件一般叫key.keystore。客户端使用的ca证书一般称为：truststore</p></blockquote><h1 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h1><p>openssl对证书签名的时候有可能报国家、组织、地区需一致的错误，是因为在openssl.cfg中的policy_match里面的前三个都选了match，可以修改optional，修改后就可以了</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;h1 id=&quot;用openssl指令逐步生成各个文件&quot;&gt;&lt;a href=&quot;#用openssl指令逐步生成各个文件&quot; class=&quot;headerlink&quot; title=&quot;用openssl指令逐步生成各个文件&quot;&gt;&lt;/a&gt;用openssl指令逐步生成各个文件&lt;/h1&gt;&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;生成服务器密钥：openssl genrsa -out server_private.key 2048&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;从密钥生成公钥（非必须）：openssl rsa -in server_private.key -pubout &amp;gt; server_public.key&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;生成证书请求文件，这里会让你输入一堆信息，比如组织名称、个人信息等：openssl req -new -key server_private.key -out server_req.csr&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;初始化CA环境&lt;/p&gt;
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;mkdir demoCA&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;cd demoCA&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;mkdir certs crl newcerts&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;touch index.txt serial&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;echo 00 &amp;gt; serial&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;cd ..&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;生成ca密钥：openssl genrsa -out ca.key 2048&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;生成ca证书：openssl req -new -x509 -key ca.key -out ca.crt&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;用ca对服务器证书请求文件进行签名:openssl ca -in server_req.csr -out server.crt -cert ca.crt -keyfile ca.key -config /usr/ssl/openssl.cnf&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;可以把服务端的私钥和已签名的证书合并到一个pkcs12格式的文件：openssl pkcs12 -export -out server.pfx -inkey server_private.key -in server.crt  &lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;也可以把pkcs12格式转化为java常用的jks格式：keytool -importkeystore -v -srckeystore server.pfx -srcstoretype pkcs12 -srcstorepass 123456 -destkeystore server.jks -deststoretype jks -deststorepass 123456&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-    
-    </summary>
-    
-      <category term="杂七杂八" scheme="http://blog.hanschen.site/categories/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/"/>
-    
-    
-      <category term="非对称加密" scheme="http://blog.hanschen.site/tags/%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86/"/>
-    
-      <category term="keytool,rsa" scheme="http://blog.hanschen.site/tags/keytool-rsa/"/>
-    
-      <category term="证书生成" scheme="http://blog.hanschen.site/tags/%E8%AF%81%E4%B9%A6%E7%94%9F%E6%88%90/"/>
     
   </entry>
   

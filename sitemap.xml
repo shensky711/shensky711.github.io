@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://blog.hanschen.site/2019/09/12/aosp_compile_and_flash/</loc>
+    
+    <lastmod>2019-09-12T09:13:53.797Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://blog.hanschen.site/tags/index.html</loc>
     
     <lastmod>2019-09-02T06:30:29.832Z</lastmod>
@@ -51,14 +58,14 @@
   </url>
   
   <url>
-    <loc>http://blog.hanschen.site/2016/12/27/pattern_proxy/</loc>
+    <loc>http://blog.hanschen.site/2016/12/18/dagger2/</loc>
     
     <lastmod>2019-09-02T06:30:29.827Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://blog.hanschen.site/2016/12/18/dagger2/</loc>
+    <loc>http://blog.hanschen.site/2016/12/27/pattern_proxy/</loc>
     
     <lastmod>2019-09-02T06:30:29.827Z</lastmod>
     
@@ -107,14 +114,14 @@
   </url>
   
   <url>
-    <loc>http://blog.hanschen.site/2016/10/13/java-native-interface-specification/</loc>
+    <loc>http://blog.hanschen.site/2016/10/20/java-proxy/</loc>
     
     <lastmod>2019-09-02T06:30:29.824Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://blog.hanschen.site/2016/10/20/java-proxy/</loc>
+    <loc>http://blog.hanschen.site/2016/10/13/java-native-interface-specification/</loc>
     
     <lastmod>2019-09-02T06:30:29.824Z</lastmod>
     
@@ -163,14 +170,14 @@
   </url>
   
   <url>
-    <loc>http://blog.hanschen.site/2016/08/26/Android-64k-issue/</loc>
+    <loc>http://blog.hanschen.site/2016/08/17/makefile/</loc>
     
     <lastmod>2019-09-02T06:30:29.822Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://blog.hanschen.site/2016/08/17/makefile/</loc>
+    <loc>http://blog.hanschen.site/2016/08/26/Android-64k-issue/</loc>
     
     <lastmod>2019-09-02T06:30:29.822Z</lastmod>
     
@@ -184,14 +191,14 @@
   </url>
   
   <url>
-    <loc>http://blog.hanschen.site/2016/08/15/git-guide-1/</loc>
+    <loc>http://blog.hanschen.site/2016/07/12/mock-web-server/</loc>
     
     <lastmod>2019-09-02T06:30:29.821Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://blog.hanschen.site/2016/07/12/mock-web-server/</loc>
+    <loc>http://blog.hanschen.site/2016/08/15/git-guide-1/</loc>
     
     <lastmod>2019-09-02T06:30:29.821Z</lastmod>
     
