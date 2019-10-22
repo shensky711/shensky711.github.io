@@ -244,7 +244,7 @@ void RenderNode::handleForceDark(android::uirenderer::TreeInfo *info) {
         }
     }
 
-    // 根据 UsageHint 设置变色策略：Dark、Light
+    // 根据 UsageHint 设置变色策略：Dark（压暗）、Light（提亮）
     mDisplayList->mDisplayList.applyColorTransform(
             usage == UsageHint::Background ? ColorTransform::Dark : ColorTransform::Light);
 }
@@ -253,7 +253,8 @@ void RenderNode::handleForceDark(android::uirenderer::TreeInfo *info) {
 ```cpp
 // frameworks/base/libs/hwui/RecordingCanvas.cpp
 void DisplayListData::applyColorTransform(ColorTransform transform) {
-    // transform: ColorTransform::Dark 或 ColorTransform::Light
+    // transform: Dark 或 Light
+    // color_transform_fns 是一个对应所有绘制指令的函数指针数组，主要是对 op 的 paint 变色或对 bitmap 添加 colorfilter
     this->map(color_transform_fns, transform);
 }
 
@@ -321,21 +322,22 @@ color_transform_fn 宏定义展开
 template <class T>
 constexpr color_transform_fn colorTransformForOp() {
     if
-        // op 变量中是否同时包含 paint 及 palette 属性，若同时包含，则是一个 bitmap
+        // op 变量中是否同时包含 paint 及 palette 属性，若同时包含，则是绘制 Image 或者 VectorDrawable 的指令
+        // 参考：frameworks/base/libs/hwui/RecordingCanvas.cpp 中各 Op 的定义
         constexpr(has_paint<T> && has_palette<T>) {
         
             return [](const void* opRaw, ColorTransform transform) {
                 const T* op = reinterpret_cast<const T*>(opRaw);
-                // 关键变色方法，对 paint 和 palette 进行变换
+                // 关键变色方法，根据 palette 叠加 colorfilter
                 transformPaint(transform, const_cast<SkPaint*>(&(op->paint)), op->palette);
             };
         }
     else if
-        // op 变量中是否包含 paint 属性
+        // op 变量中是否包含 paint 属性，普通绘制指令
         constexpr(has_paint<T>) {
             return [](const void* opRaw, ColorTransform transform) {
                 const T* op = reinterpret_cast<const T*>(opRaw);
-                // 关键变色方法，对 paint 进行变换
+                // 关键变色方法，对 paint 颜色进行变换
                 transformPaint(transform, const_cast<SkPaint*>(&(op->paint)));
             };
         }
@@ -362,7 +364,7 @@ inline void DisplayListData::map(const Fn fns[], Args... args) const {
         auto type = op->type;
         auto skip = op->skip;
         if (auto fn = fns[type]) {  // We replace no-op functions with nullptrs
-            // 对 op 的 paint 或者 palette 进行变换
+            // 对 op 的 paint 进行颜色变换或叠加 colorfilter
             fn(op, args...);        // to avoid the overhead of a pointless call.
         }
         ptr += skip;
@@ -373,9 +375,9 @@ inline void DisplayListData::map(const Fn fns[], Args... args) const {
 贴了一大段代码，虽然代码中已经包含了注释，但还是可能比较晕，我们先来整理下：
  - CanvasContext.mUseForceDark 只会影响 TreeInfo.disableForceDark 的初始化
  - TreeInfo.disableForceDark 若大于 0，RenderNode 在执行 handleForceDark 就会直接退出
- - handleForceDark 方法里会根据 UsageHint 类型，对所有 op 中的 paint 或 palette 进行颜色变换。变换策略有：Dark、Light
+ - handleForceDark 方法里会根据 UsageHint 类型，对所有 op 中的 paint 颜色进行变换，如果是绘制图片，则叠加一个反转的 colorfilter。变换策略有：Dark、Light
 
-接下来让我们来看 paint 和 palette 的变色实现
+接下来让我们来看 paint 和 colorfilter 的变色实现
 ```cpp
 bool transformPaint(ColorTransform transform, SkPaint* paint) {
     applyColorTransform(transform, *paint);
@@ -560,9 +562,10 @@ public:
 void RenderNode::prepareTreeImpl(TreeObserver& observer, TreeInfo& info, bool functorsNeedLayer) {
 
      ...
-    // 如果 view 关闭了夜间模式，会在这里让 info.disableForceDark 加 1
-    // 而 info.disableForceDark 正是 handleForceDark 中关键变量，还记得吗？
-    // nfo.disableForceDark 大于 0 会让此 RenderNode 跳过夜间模式处理
+    // 1. 如果 view 关闭了夜间模式，会在这里让 info.disableForceDark 加 1
+    // 2. info.disableForceDark 正是 handleForceDark 中关键变量，还记得吗？
+    // 3. nfo.disableForceDark 大于 0 会让此 RenderNode 跳过夜间模式处理
+    // 4. 如果 info.disableForceDark 本身已经大于 0 了，view.setForceDarkAllowed(true) 也毫无意义
     if (!mProperties.getAllowForceDark()) {
         info.disableForceDark++;
     }
@@ -599,7 +602,7 @@ void RenderNode::prepareTreeImpl(TreeObserver& observer, TreeInfo& info, bool fu
 ```
 
 # 5. 总结
-本文到目前为止，总算把 Android Q 夜间模式实现原理梳理了一遍，总的来说实现不算复杂，说白了就是把 paint 中的颜色转换一下，虽然中间还有关联知识没有细说，如 RenderThread、DisplayList、RenderNode 等图形相关的概念，限于文章大小，请读者自行了解
+本文到目前为止，总算把 Android Q 夜间模式实现原理梳理了一遍，总的来说实现不算复杂，说白了就是把 paint 中的颜色转换一下或者叠加一个 colorfilter，虽然中间还有关联知识没有细说，如 RenderThread、DisplayList、RenderNode 等图形相关的概念，限于文章大小，请读者自行了解
 
 另外，由于水平有限，难免文中有错漏之处，若哪里写的不对，请大家及时指出，蟹蟹啦~
 
