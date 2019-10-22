@@ -192,8 +192,8 @@
         <category>Android</category>
       </categories>
       <tags>
-        <tag>jni</tag>
         <tag>java</tag>
+        <tag>jni</tag>
         <tag>java native interface specification</tag>
         <tag>ndk</tag>
       </tags>
