@@ -474,9 +474,9 @@
       <category term="Android" scheme="http://blog.hanschen.site/categories/Android/"/>
     
     
-      <category term="java" scheme="http://blog.hanschen.site/tags/java/"/>
-    
       <category term="jni" scheme="http://blog.hanschen.site/tags/jni/"/>
+    
+      <category term="java" scheme="http://blog.hanschen.site/tags/java/"/>
     
       <category term="java native interface specification" scheme="http://blog.hanschen.site/tags/java-native-interface-specification/"/>
     

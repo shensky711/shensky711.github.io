@@ -4,7 +4,7 @@
   <url>
     <loc>http://blog.hanschen.site/about/index.html</loc>
     
-    <lastmod>2019-10-22T02:08:26.027Z</lastmod>
+    <lastmod>2019-10-22T02:11:19.896Z</lastmod>
     
   </url>
   
@@ -51,20 +51,6 @@
   </url>
   
   <url>
-    <loc>http://blog.hanschen.site/2016/08/15/why-https-safe/</loc>
-    
-    <lastmod>2019-09-02T06:30:29.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://blog.hanschen.site/2016/08/17/makefile/</loc>
-    
-    <lastmod>2019-09-02T06:30:29.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://blog.hanschen.site/2016/08/15/git-guide-1/</loc>
     
     <lastmod>2019-09-02T06:30:29.000Z</lastmod>
@@ -72,7 +58,7 @@
   </url>
   
   <url>
-    <loc>http://blog.hanschen.site/2016/08/26/Android-64k-issue/</loc>
+    <loc>http://blog.hanschen.site/2016/08/15/why-https-safe/</loc>
     
     <lastmod>2019-09-02T06:30:29.000Z</lastmod>
     
@@ -86,14 +72,21 @@
   </url>
   
   <url>
-    <loc>http://blog.hanschen.site/2016/08/30/lua-guide/</loc>
+    <loc>http://blog.hanschen.site/2016/08/17/makefile/</loc>
     
     <lastmod>2019-09-02T06:30:29.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://blog.hanschen.site/2016/09/15/proguard/</loc>
+    <loc>http://blog.hanschen.site/2016/08/26/Android-64k-issue/</loc>
+    
+    <lastmod>2019-09-02T06:30:29.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.hanschen.site/2016/08/30/lua-guide/</loc>
     
     <lastmod>2019-09-02T06:30:29.000Z</lastmod>
     
@@ -107,7 +100,21 @@
   </url>
   
   <url>
+    <loc>http://blog.hanschen.site/2016/09/15/proguard/</loc>
+    
+    <lastmod>2019-09-02T06:30:29.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://blog.hanschen.site/2016/10/09/Android-Studio-2.2-NDK/</loc>
+    
+    <lastmod>2019-09-02T06:30:29.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.hanschen.site/2016/10/13/java-native-interface-specification/</loc>
     
     <lastmod>2019-09-02T06:30:29.000Z</lastmod>
     
@@ -128,21 +135,7 @@
   </url>
   
   <url>
-    <loc>http://blog.hanschen.site/2016/10/13/java-native-interface-specification/</loc>
-    
-    <lastmod>2019-09-02T06:30:29.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://blog.hanschen.site/2016/11/11/fragment-transaction/</loc>
-    
-    <lastmod>2019-09-02T06:30:29.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://blog.hanschen.site/2016/11/26/design-patterns-factory/</loc>
     
     <lastmod>2019-09-02T06:30:29.000Z</lastmod>
     
@@ -156,14 +149,14 @@
   </url>
   
   <url>
-    <loc>http://blog.hanschen.site/2016/12/01/design-patterns-template-and-strategy/</loc>
+    <loc>http://blog.hanschen.site/2016/11/26/design-patterns-factory/</loc>
     
     <lastmod>2019-09-02T06:30:29.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://blog.hanschen.site/2016/12/27/pattern_proxy/</loc>
+    <loc>http://blog.hanschen.site/2016/12/01/design-patterns-template-and-strategy/</loc>
     
     <lastmod>2019-09-02T06:30:29.000Z</lastmod>
     
@@ -184,7 +177,7 @@
   </url>
   
   <url>
-    <loc>http://blog.hanschen.site/2017/03/09/pattern_decorator/</loc>
+    <loc>http://blog.hanschen.site/2016/12/27/pattern_proxy/</loc>
     
     <lastmod>2019-09-02T06:30:29.000Z</lastmod>
     
@@ -198,6 +191,13 @@
   </url>
   
   <url>
+    <loc>http://blog.hanschen.site/2017/03/09/pattern_decorator/</loc>
+    
+    <lastmod>2019-09-02T06:30:29.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://blog.hanschen.site/2017/04/08/protobuf3/</loc>
     
     <lastmod>2019-09-02T06:30:29.000Z</lastmod>
@@ -205,14 +205,14 @@
   </url>
   
   <url>
-    <loc>http://blog.hanschen.site/categories/index.html</loc>
+    <loc>http://blog.hanschen.site/archives/index.html</loc>
     
     <lastmod>2019-09-02T06:30:29.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://blog.hanschen.site/archives/index.html</loc>
+    <loc>http://blog.hanschen.site/categories/index.html</loc>
     
     <lastmod>2019-09-02T06:30:29.000Z</lastmod>
     
