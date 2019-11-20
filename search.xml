@@ -164,9 +164,9 @@
       </categories>
       <tags>
         <tag>Fragment</tag>
-        <tag>源码分析</tag>
         <tag>事务管理</tag>
         <tag>transaction</tag>
+        <tag>源码分析</tag>
       </tags>
   </entry>
   <entry>
@@ -203,8 +203,8 @@
         <category>Android</category>
       </categories>
       <tags>
-        <tag>java</tag>
         <tag>jni</tag>
+        <tag>java</tag>
         <tag>java native interface specification</tag>
         <tag>ndk</tag>
       </tags>

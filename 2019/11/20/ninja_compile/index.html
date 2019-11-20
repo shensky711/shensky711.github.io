@@ -68,7 +68,7 @@
 <meta property="og:site_name" content="HansChen 的博客">
 <meta property="og:description" content="1. 简介从 Android 7 开始，Android 源码编译时默认使用 Ninja，编译时，会先把 makefile 和 bp 转换成 ninja 再进行编译。这个转换过程非常慢（需要遍历处理所有关联的 makefile、bp 文件），即使只是通过 mm 或 mmm 编译某个模块，也会有很多因素触发 ninja 文件的重新生成，而这对基于源码开发的模块很不友好，编译好慢！ 2. 初识 ninj">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-11-20T09:20:08.991Z">
+<meta property="og:updated_time" content="2019-11-20T09:26:25.423Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用 Ninja 提升模块编译速度">
 <meta name="twitter:description" content="1. 简介从 Android 7 开始，Android 源码编译时默认使用 Ninja，编译时，会先把 makefile 和 bp 转换成 ninja 再进行编译。这个转换过程非常慢（需要遍历处理所有关联的 makefile、bp 文件），即使只是通过 mm 或 mmm 编译某个模块，也会有很多因素触发 ninja 文件的重新生成，而这对基于源码开发的模块很不友好，编译好慢！ 2. 初识 ninj">
@@ -291,7 +291,7 @@
                 
               
 
-              <time title="创建时间：2019-11-20 00:00:00 / 修改时间：17:20:08" itemprop="dateCreated datePublished" datetime="2019-11-20T00:00:00+08:00">2019-11-20</time>
+              <time title="创建时间：2019-11-20 00:00:00 / 修改时间：17:26:25" itemprop="dateCreated datePublished" datetime="2019-11-20T00:00:00+08:00">2019-11-20</time>
             </span>
           
             
@@ -379,18 +379,16 @@
 
 <p>简单使用的话，我们关注它的两个参数就行了</p>
 <ul>
-<li><p><code>-f</code>：这个参数指定的就是输入文件，也就是 makefile 和 bp 转换后的 ninja 文件，一般位于 <code>./out</code> 目录，后面会说</p>
-</li>
-<li><p><code>targets</code>：目标，这个和 makefile 是类似的，就是我们最终需要的产物，例如：Launcher3QuickStep、SystemUI。那么这些 targets 名是哪里定义的呢？要知道对应模块的对应的 target 名，只需要：</p>
-<ul>
+<li><code>-f</code>：这个参数指定的就是输入文件，也就是 makefile 和 bp 转换后的 ninja 文件，一般位于 <code>./out</code> 目录，后面会说</li>
+<li><code>targets</code>：目标，这个和 makefile 是类似的，就是我们最终需要的产物，例如：Launcher3QuickStep、SystemUI。那么这些 targets 名是哪里定义的呢？要知道对应模块的对应的 target 名，只需要：<ul>
 <li>若模块使用的是 Android.mk：查找 <code>LOCAL_PACKAGE_NAME</code> 或 <code>LOCAL_MODULE</code> 等对应的值</li>
 <li>若模块使用的是 Android.bp：查找 module 中 name 对应的值</li>
+</ul>
+</li>
 </ul>
 <p>举个栗子：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">➜ android-10.0.0_r11 ./prebuilts/build-tools/linux-x86/bin/ninja -f out/combined-aosp_walleye.ninja Launcher3QuickStep</span><br><span class="line">[3/13] Target Java: out/target/common/obj/JAVA_LIBRARIES/Launcher3QuickStepLib_intermediates/classes-full-debug.jar</span><br><span class="line">注: 某些输入文件使用或覆盖了已过时的 API。</span><br><span class="line">注: 有关详细信息, 请使用 -Xlint:deprecation 重新编译。</span><br><span class="line">注: 某些输入文件使用了未经检查或不安全的操作。</span><br><span class="line">注: 有关详细信息, 请使用 -Xlint:unchecked 重新编译。</span><br><span class="line">[13/13] Install: out/target/product/walleye/system/product/priv-app/Launcher3QuickStep/Launcher3QuickStep.apk</span><br></pre></td></tr></table></figure>
 
-</li>
-</ul>
 <p>就这样，不需要通过 <code>mm</code> 或者 <code>mmm</code> 命令，目标产物同样生成了。我们看看耗时：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">➜ android-10.0.0_r11 time ./prebuilts/build-tools/linux-x86/bin/ninja -f out/combined-aosp_walleye.ninja Launcher3QuickStep</span><br><span class="line">[3/13] Target Java: out/target/common/obj/JAVA_LIBRARIES/Launcher3QuickStepLib_intermediates/classes-full-debug.jar</span><br><span class="line">注: 某些输入文件使用或覆盖了已过时的 API。</span><br><span class="line">注: 有关详细信息, 请使用 -Xlint:deprecation 重新编译。</span><br><span class="line">注: 某些输入文件使用了未经检查或不安全的操作。</span><br><span class="line">注: 有关详细信息, 请使用 -Xlint:unchecked 重新编译。</span><br><span class="line">[13/13] Install: out/target/product/walleye/system/product/priv-app/Launcher3QuickStep/Launcher3QuickStep.apk</span><br><span class="line"></span><br><span class="line">real	0m18.994s</span><br><span class="line">user	1m20.548s</span><br><span class="line">sys	0m2.872s</span><br></pre></td></tr></table></figure>
 
