@@ -254,6 +254,180 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.hanschen.site/2019/11/20/ninja_compile/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="chenhang">
+      <meta itemprop="description" content="博观而约取，厚积而薄发。">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HansChen 的博客">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2019/11/20/ninja_compile/" class="post-title-link" itemprop="url">使用 Ninja 提升模块编译速度</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-11-20 00:00:00 / 修改时间：17:20:08" itemprop="dateCreated datePublished" datetime="2019-11-20T00:00:00+08:00">2019-11-20</time>
+            </span>
+          
+            
+
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/" itemprop="url" rel="index"><span itemprop="name">Android</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="fa fa-comment-o"></i>
+    </span>
+    
+      <span class="post-meta-item-text">评论数：</span>
+    
+  
+    <a href="/2019/11/20/ninja_compile/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/11/20/ninja_compile/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">3.4k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">3 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          
+            <h1 id="1-简介"><a href="#1-简介" class="headerlink" title="1. 简介"></a>1. 简介</h1><p>从 Android 7 开始，Android 源码编译时默认使用 Ninja，编译时，会先把 makefile 和 bp 转换成 ninja 再进行编译。这个转换过程非常慢（需要遍历处理所有关联的 makefile、bp 文件），即使只是通过 <code>mm</code> 或 <code>mmm</code> 编译某个模块，也会有很多因素触发 ninja 文件的重新生成，而这对基于源码开发的模块很不友好，编译好慢！</p>
+<h1 id="2-初识-ninja"><a href="#2-初识-ninja" class="headerlink" title="2. 初识 ninja"></a>2. 初识 ninja</h1><p>AOSP 在源码中已经内置了一个 ninja 执行文件，路径为：<code>./prebuilts/build-tools/linux-x86/bin/ninja</code></p>
+<p>我们先看看它的 help：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">➜  ~ ./prebuilts/build-tools/linux-x86/bin/ninja -h</span><br><span class="line">usage: ninja [options] [targets...]</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> targets are unspecified, builds the <span class="string">'default'</span> target (see manual).</span><br><span class="line"></span><br><span class="line">options:</span><br><span class="line">  --version      <span class="built_in">print</span> ninja version (<span class="string">"1.9.0"</span>)</span><br><span class="line">  -v, --verbose  show all <span class="built_in">command</span> lines <span class="keyword">while</span> building</span><br><span class="line"></span><br><span class="line">  -C DIR   change to DIR before doing anything <span class="keyword">else</span></span><br><span class="line">  -f FILE  specify input build file [default=build.ninja]</span><br><span class="line"></span><br><span class="line">  -j N     run N <span class="built_in">jobs</span> <span class="keyword">in</span> parallel (0 means infinity) [default=10 on this system]</span><br><span class="line">  -k N     keep going until N <span class="built_in">jobs</span> fail (0 means infinity) [default=1]</span><br><span class="line">  -l N     <span class="keyword">do</span> not start new <span class="built_in">jobs</span> <span class="keyword">if</span> the load average is greater than N</span><br><span class="line">  -n       dry run (don<span class="string">'t run commands but act like they succeeded)</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">  -d MODE  enable debugging (use '</span>-d list<span class="string">' to list modes)</span></span><br><span class="line"><span class="string">  -t TOOL  run a subtool (use '</span>-t list<span class="string">' to list subtools)</span></span><br><span class="line"><span class="string">    terminates toplevel options; further flags are passed to the tool</span></span><br><span class="line"><span class="string">  -w FLAG  adjust warnings (use '</span>-w list<span class="string">' to list warnings)</span></span><br></pre></td></tr></table></figure>
+
+<p>简单使用的话，我们关注它的两个参数就行了</p>
+<ul>
+<li><p><code>-f</code>：这个参数指定的就是输入文件，也就是 makefile 和 bp 转换后的 ninja 文件，一般位于 <code>./out</code> 目录，后面会说</p>
+</li>
+<li><p><code>targets</code>：目标，这个和 makefile 是类似的，就是我们最终需要的产物，例如：Launcher3QuickStep、SystemUI。那么这些 targets 名是哪里定义的呢？要知道对应模块的对应的 target 名，只需要：</p>
+<ul>
+<li>若模块使用的是 Android.mk：查找 <code>LOCAL_PACKAGE_NAME</code> 或 <code>LOCAL_MODULE</code> 等对应的值</li>
+<li>若模块使用的是 Android.bp：查找 module 中 name 对应的值</li>
+</ul>
+<p>举个栗子：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">➜ android-10.0.0_r11 ./prebuilts/build-tools/linux-x86/bin/ninja -f out/combined-aosp_walleye.ninja Launcher3QuickStep</span><br><span class="line">[3/13] Target Java: out/target/common/obj/JAVA_LIBRARIES/Launcher3QuickStepLib_intermediates/classes-full-debug.jar</span><br><span class="line">注: 某些输入文件使用或覆盖了已过时的 API。</span><br><span class="line">注: 有关详细信息, 请使用 -Xlint:deprecation 重新编译。</span><br><span class="line">注: 某些输入文件使用了未经检查或不安全的操作。</span><br><span class="line">注: 有关详细信息, 请使用 -Xlint:unchecked 重新编译。</span><br><span class="line">[13/13] Install: out/target/product/walleye/system/product/priv-app/Launcher3QuickStep/Launcher3QuickStep.apk</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>就这样，不需要通过 <code>mm</code> 或者 <code>mmm</code> 命令，目标产物同样生成了。我们看看耗时：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">➜ android-10.0.0_r11 time ./prebuilts/build-tools/linux-x86/bin/ninja -f out/combined-aosp_walleye.ninja Launcher3QuickStep</span><br><span class="line">[3/13] Target Java: out/target/common/obj/JAVA_LIBRARIES/Launcher3QuickStepLib_intermediates/classes-full-debug.jar</span><br><span class="line">注: 某些输入文件使用或覆盖了已过时的 API。</span><br><span class="line">注: 有关详细信息, 请使用 -Xlint:deprecation 重新编译。</span><br><span class="line">注: 某些输入文件使用了未经检查或不安全的操作。</span><br><span class="line">注: 有关详细信息, 请使用 -Xlint:unchecked 重新编译。</span><br><span class="line">[13/13] Install: out/target/product/walleye/system/product/priv-app/Launcher3QuickStep/Launcher3QuickStep.apk</span><br><span class="line"></span><br><span class="line">real	0m18.994s</span><br><span class="line">user	1m20.548s</span><br><span class="line">sys	0m2.872s</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，整个编译在 18s 完成了，相比动辄七八分钟的 <code>mmm</code>，效率提升还是很可观的。</p>
+<h2 id="3-注意事项"><a href="#3-注意事项" class="headerlink" title="3. 注意事项"></a>3. 注意事项</h2><p>虽然 ninja 很方便，但要用它来编译单个模块，还是有一些限制和注意事项的：</p>
+<ul>
+<li>使用前需把对应模块编译一遍，用于生产 ninja 文件（全编或 <code>mmm</code> 都可以）</li>
+<li>全编后，生成的 ninja 文件为：<code>./out/combined-[TARGET-PRODUCT].ninja</code></li>
+<li><code>mmm</code> 编译后，生成的 ninja 文件为：<code>./out/combined-[TARGET-PRODUCT]-_[path_to_your_module_makefile].ninja</code>，比如：<code>./out/combined-aosp_walleye-_packages_apps_Launcher3_Android.mk.ninja</code></li>
+<li>如果修改了 Android.mk 或 Android.bp，需使用传统的 make 命令进行编译以重新生成包含新依赖规则的 ninja 文件</li>
+<li>可以把 ninja 放到 PATH 环境变量中，这样就不用每次都敲 ./prebuilts/build-tools/linux-x86/bin/ninja 这个路径了</li>
+</ul>
+<h2 id="4-最后"><a href="#4-最后" class="headerlink" title="4. 最后"></a>4. 最后</h2><p>为 Launcher 和 SystemUI 准备一份开箱即用的指令，尽情玩耍吧~</p>
+<p>Launcher：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./prebuilts/build-tools/linux-x86/bin/ninja -f out/combined-qssi-_packages_apps_Launcher3_Android.mk.ninja Launcher3QuickStep</span><br></pre></td></tr></table></figure>
+
+<p>SystemUI：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./prebuilts/build-tools/linux-x86/bin/ninja -f out/combined-qssi-_frameworks_base_packages_SystemUI_Android.mk.ninja SystemUI</span><br></pre></td></tr></table></figure>
+
+
+          
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+    
+      
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://blog.hanschen.site/2019/10/22/android_q_dark_mode/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1804,163 +1978,6 @@
   </article>
 
     
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.hanschen.site/2016/12/01/design-patterns-template-and-strategy/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="chenhang">
-      <meta itemprop="description" content="博观而约取，厚积而薄发。">
-      <meta itemprop="image" content="/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="HansChen 的博客">
-    </span>
-      <header class="post-header">
-
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2016/12/01/design-patterns-template-and-strategy/" class="post-title-link" itemprop="url">设计模式之模板方法模式和策略模式</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2016-12-01 00:00:00" itemprop="dateCreated datePublished" datetime="2016-12-01T00:00:00+08:00">2016-12-01</time>
-            </span>
-          
-            
-
-            
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2019-09-02 14:30:29" itemprop="dateModified" datetime="2019-09-02T14:30:29+08:00">2019-09-02</time>
-              </span>
-            
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/设计模式/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-  
-  <span class="post-meta-item">
-    
-    <span class="post-meta-item-icon">
-      <i class="fa fa-comment-o"></i>
-    </span>
-    
-      <span class="post-meta-item-text">评论数：</span>
-    
-  
-    <a href="/2016/12/01/design-patterns-template-and-strategy/#comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2016/12/01/design-patterns-template-and-strategy/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-          <br>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">本文字数：</span>
-              
-              <span title="本文字数">11k</span>
-            </span>
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              
-              <span title="阅读时长">10 分钟</span>
-            </span>
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>我们知道，OOP三个基本特征是:封装、继承、多态。通过继承，我们可以基于差异编程，也就是说，对于一个满足我们大部分需求的类，可以创建它的一个子类并只改变我们不期望的那部分。但是在实际使用中，继承很容易被过度使用，并且过度使用的代价是比较高的，所以我们减少了继承的使用，使用组合或委托代替</p>
-<blockquote>
-<p>优先使用对象组合而不是类继承</p>
-</blockquote>
-<p>在本文中，我们会分别介绍<code>模板方法模式</code>和<code>策略模式</code>，这两个模式分别使用了继承和委托两种方式。这两种模式解决的问题是类似的，经常可以互换使用，它们都可以分离通用的算法和具体的上下文。比如我们有一个通用的算法，算法有不同的实现方式，为了遵循依赖倒置原则，我们希望算法不依赖于具体实现。</p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2016/12/01/design-patterns-template-and-strategy/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-    
   </section>
 
   
@@ -2001,7 +2018,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">28</span>
+          <span class="site-state-item-count">29</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -2236,14 +2253,14 @@
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">259k</span>
+    <span title="站点总字数">262k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">3:55</span>
+    <span title="站点阅读时长">3:58</span>
 </div>
 
         
